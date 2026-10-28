@@ -31,6 +31,97 @@ STEP-8: Repeat the above steps to generate the entire cipher text.
 
 ## PROGRAM
 
+```#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char table[26][26];
+
+void buildTable() {
+    for (int i = 0; i < 26; i++)
+        for (int j = 0; j < 26; j++)
+            table[i][j] = 'A' + (i + j) % 26;
+}
+
+void encrypt(char* plaintext, char* key, char* ciphertext) {
+    int textLen = strlen(plaintext);
+    int keyLen = strlen(key);
+
+    for (int i = 0, j = 0; i < textLen; i++) {
+        char p = plaintext[i];
+        if (isalpha(p)) {
+            int row = tolower(key[j % keyLen]) - 'a';
+            int col = tolower(p) - 'a';
+            char c = table[row][col];
+            ciphertext[i] = isupper(p) ? c : tolower(c);
+            j++;
+        } else {
+            ciphertext[i] = p;
+        }
+    }
+    ciphertext[textLen] = '\0';
+}
+
+void decrypt(char* ciphertext, char* key, char* plaintext) {
+    int textLen = strlen(ciphertext);
+    int keyLen = strlen(key);
+
+    for (int i = 0, j = 0; i < textLen; i++) {
+        char c = ciphertext[i];
+        if (isalpha(c)) {
+            int row = tolower(key[j % keyLen]) - 'a';
+            int col = 0;
+            while (table[row][col] != toupper(c))
+                col++;
+            char p = 'A' + col;
+            plaintext[i] = isupper(c) ? p : tolower(p);
+            j++;
+        } else {
+            plaintext[i] = c;
+        }
+    }
+    plaintext[textLen] = '\0';
+}
+
+int main() {
+    char plaintext[1024], key[1024], ciphertext[1024], decrypted[1024];
+
+    buildTable();
+
+    printf("Enter plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+    plaintext[strcspn(plaintext, "\n")] = '\0';
+
+    printf("Enter key (alphabetic only): ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = '\0';
+
+    if (strlen(key) == 0) {
+        printf("Key cannot be empty.\n");
+        return 1;
+    }
+    for (int i = 0; key[i]; i++) {
+        if (!isalpha(key[i])) {
+            printf("Key must contain only letters.\n");
+            return 1;
+        }
+    }
+
+    encrypt(plaintext, key, ciphertext);
+    printf("Encrypted text: %s\n", ciphertext);
+
+    decrypt(ciphertext, key, decrypted);
+    printf("Decrypted text: %s\n", decrypted);
+    return 0;
+}
+
+```
+
 ## OUTPUT
 
+<img width="1917" height="1078" alt="image" src="https://github.com/user-attachments/assets/41f1438f-ffcb-4503-bcb4-7ed5438e6f19" />
+
+
 ## RESULT
+
+Thus, the C program to implement the Vigenère Cipher was executed successfully and the output was verified.
